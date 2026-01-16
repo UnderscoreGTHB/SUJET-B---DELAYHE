@@ -19,7 +19,6 @@
             width: 100%; position: fixed;
         }
 
-        /* Curseur personnalisé */
         #cursor {
             position: fixed; width: 8px; height: 8px; background: var(--accent);
             border-radius: 50%; pointer-events: none; z-index: 10000;
@@ -36,12 +35,11 @@
             position: absolute; inset: 0; display: flex; flex-direction: column;
             justify-content: center; align-items: center; opacity: 0; visibility: hidden;
             transition: all 1.2s cubic-bezier(0.23, 1, 0.32, 1); z-index: 2;
-            transform: scale(1.1); filter: blur(15px);
+            transform: scale(1.1); filter: blur(15px); text-align: center;
         }
 
         .slide.active { opacity: 1; visibility: visible; transform: scale(1); filter: blur(0); }
 
-        /* Flèche d'indication au début */
         .click-hint {
             position: absolute; right: 5%; top: 50%; transform: translateY(-50%);
             display: flex; align-items: center; gap: 15px;
@@ -54,14 +52,14 @@
         }
 
         h1 {
-            font-size: clamp(3rem, 15vw, 10rem); font-weight: 900; letter-spacing: -0.06em;
+            font-size: clamp(3rem, 12vw, 8.2rem); font-weight: 900; letter-spacing: -0.06em;
             background: linear-gradient(180deg, #fff 40%, #555 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            line-height: 0.85; text-align: center;
+            line-height: 0.85; margin-bottom: 10px;
         }
         
         .label { font-size: 0.8rem; color: var(--blue); letter-spacing: 0.7em; text-transform: uppercase; margin-bottom: 20px; }
-        .number-large { font-size: clamp(6rem, 28vw, 18rem); font-weight: 900; letter-spacing: -0.05em; }
+        .number-large { font-size: clamp(6rem, 25vw, 15rem); font-weight: 900; letter-spacing: -0.05em; line-height: 1; }
 
         .btn-container { display: flex; gap: 15px; z-index: 6000; margin-top: 30px; }
         .action-btn {
@@ -77,8 +75,9 @@
             padding: 40px; overflow-y: auto;
         }
         .pane-content { max-width: 800px; margin: 60px auto; }
-        .pane-content h2 { font-size: 2rem; color: var(--blue); margin-bottom: 25px; font-weight: 900; }
-        .math-box { border-left: 3px solid #333; padding: 20px; margin: 20px 0; font-family: monospace; background: rgba(255,255,255,0.02); }
+        .pane-content h2 { font-size: 2.5rem; color: var(--blue); margin-bottom: 25px; font-weight: 900; letter-spacing: -0.02em; }
+        .pane-content p { font-size: 1.2rem; line-height: 1.8; color: #ccc; margin-bottom: 20px; }
+        .math-box { border-left: 3px solid var(--blue); padding: 25px; margin: 25px 0; font-family: monospace; background: rgba(255,255,255,0.03); font-size: 1.1rem; color: #fff; }
 
         #sommaire-grid {
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px;
@@ -88,7 +87,8 @@
             justify-content: center; align-items: center; transition: 0.4s;
         }
         .romain-item:hover { border-color: var(--blue); background: rgba(0,122,255,0.05); }
-        .romain-item span { font-size: 2rem; font-weight: 900; }
+        .romain-item span { font-size: 2.5rem; font-weight: 900; margin-bottom: 5px; }
+        .romain-item small { font-size: 0.6rem; letter-spacing: 0.2em; color: #666; }
 
         .close-pane { position: fixed; top: 30px; right: 30px; font-weight: 900; letter-spacing: 0.3em; font-size: 0.8rem; z-index: 8000; }
         .progress { position: fixed; bottom: 0; left: 0; height: 2px; background: var(--blue); z-index: 10000; transition: width 0.4s; }
@@ -115,21 +115,34 @@
     <div class="slide">
         <div class="label">Probabilité p = 1/2</div>
         <div class="number-large" id="counter-2">0.0</div>
+        <div class="btn-container">
+            <div class="action-btn" onclick="openPane('q12')">DÉTAILS DU CALCUL</div>
+        </div>
     </div>
 
     <div class="slide">
         <div class="label">Harmonique N=3</div>
         <div class="number-large">5.5</div>
+        <div class="btn-container">
+            <div class="action-btn" onclick="openPane('q3')">DÉTAILS DU CALCUL</div>
+        </div>
     </div>
 
     <div class="slide">
         <div class="label">Le Dé à 6 faces</div>
         <div class="number-large">14.7</div>
+        <div class="btn-container">
+            <div class="action-btn" onclick="openPane('q4a')">DÉTAILS DU CALCUL</div>
+        </div>
     </div>
 
     <div class="slide">
         <div class="label">Base 10</div>
         <div class="number-large">29.3</div>
+        <div class="btn-container">
+            <div class="action-btn" onclick="openPane('sommaire')">SOMMAIRE</div>
+            <div class="action-btn" onclick="openPane('q4b')">DÉTAILS DU CALCUL</div>
+        </div>
     </div>
 
     <div id="masterPane" class="pane" onclick="closePane()">
@@ -142,15 +155,19 @@
         const slides = document.querySelectorAll('.slide');
         
         const contentMap = {
-            intro: `<h2>Introduction</h2><p>Sujet B – Delahaye (Le collectionneur). Analyse de l'espérance mathématique nécessaire pour compléter une collection.</p>`,
+            intro: `<h2>Introduction</h2><p>Sujet B – Jean-Paul Delahaye. Analyse de l'espérance mathématique nécessaire pour compléter une collection de N vignettes. Le problème explore la durée de l'attente pour obtenir des objets rares ou manquants.</p>`,
+            q12: `<h2>Analyse N=2</h2><p>Pour collectionner 2 vignettes, la première est obtenue immédiatement (probabilité 1). La seconde a une probabilité de 1/2 d'apparaître à chaque tirage.</p><div class="math-box">E[T] = 1 + (1 / 0.5) = 1 + 2 = 3 tirages</div>`,
+            q3: `<h2>Série Harmonique N=3</h2><p>L'espérance totale est la somme des espérances de chaque nouvelle vignette :</p><div class="math-box">T3 = 3(1/3 + 1/2 + 1/1) = 3 + 1.5 + 1 = 5.5</div>`,
+            q4a: `<h2>Le Dé (N=6)</h2><p>Pour voir les 6 faces d'un dé équilibré, il faut en moyenne :</p><div class="math-box">6 * (1 + 1/2 + 1/3 + 1/4 + 1/5 + 1/6) ≈ 14.7 tirages</div>`,
+            q4b: `<h2>Base 10</h2><p>Pour trouver tous les chiffres de 0 à 9 dans une suite aléatoire (comme les décimales de Pi), l'espérance est de :</p><div class="math-box">10 * H(10) ≈ 29.2897...</div>`,
             sommaire: `<h2>Sommaire</h2>
                 <div id="sommaire-grid">
-                    <div class="romain-item" onclick="jump(0)"><span>I</span><small>INTRO</small></div>
+                    <div class="romain-item" onclick="jump(0)"><span>I</span><small>ACCUEIL</small></div>
                     <div class="romain-item" onclick="jump(1)"><span>II</span><small>N=2</small></div>
                     <div class="romain-item" onclick="jump(2)"><span>III</span><small>N=3</small></div>
                     <div class="romain-item" onclick="jump(3)"><span>IV</span><small>LE DÉ</small></div>
                     <div class="romain-item" onclick="jump(4)"><span>V</span><small>BASE 10</small></div>
-                    <div class="romain-item" onclick="location.reload()"><span>VI</span><small>RESET</small></div>
+                    <div class="romain-item" onclick="location.reload()"><span>VI</span><small>REBOOT</small></div>
                 </div>`
         };
 
@@ -197,7 +214,6 @@
             requestAnimationFrame(step);
         }
 
-        // Fond étoilé
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth; canvas.height = window.innerHeight;
